@@ -1,5 +1,7 @@
 pub mod api;
 
+pub use api::{close_db, delete_expense, insert_expense, open_db, query_expenses, FfiExpenseRow};
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
