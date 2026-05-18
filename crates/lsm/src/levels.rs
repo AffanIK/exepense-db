@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use parking_lot::RwLock;
@@ -32,7 +31,7 @@ pub struct LevelState {
 }
 
 impl LevelManager {
-    pub fn new(levels: Vec<Vec<SstMeta>>, dir: &std::path::Path) -> Self {
+    pub fn new(levels: Vec<Vec<SstMeta>>, _dir: &std::path::Path) -> Self {
         let mut readers = HashMap::new();
         for level in &levels {
             for meta in level {
