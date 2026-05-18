@@ -1,0 +1,5 @@
+# flutter_rust_bridge v2 codegen config.
+# Run from flutter_app/: dart run flutter_rust_bridge:codegen
+rust_crate_dir: "../crates/ffi"
+dart_output_dir: "lib/src/bridge"
+c_output_path: "ios/Runner/bridge_generated.h"
