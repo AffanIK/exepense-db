@@ -1,9 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Wraps [child] with the design's stagger-in motion: opacity 0→1,
-/// translateY 14→0, blur 2→0, over [duration] starting after [delay].
+/// Wraps [child] with a subtle stagger-in motion: opacity 0→1 and a small
+/// translateY (6→0). Kept short so that combined with the tab-switch
+/// crossfade it doesn't make headings appear to "jump".
 class StaggeredFade extends StatefulWidget {
   final Widget child;
   final Duration delay;
@@ -13,7 +13,7 @@ class StaggeredFade extends StatefulWidget {
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.duration = AppDurations.stagger,
+    this.duration = const Duration(milliseconds: 380),
   });
 
   @override
@@ -45,16 +45,14 @@ class _StaggeredFadeState extends State<StaggeredFade>
       animation: _c,
       builder: (context, child) {
         final t = AppCurves.stagger.transform(_c.value);
-        final translate = (1 - t) * 14.0;
-        final blur = (1 - t) * 2.0;
-        Widget body = Opacity(opacity: t, child: child);
-        if (blur > 0.05) {
-          body = ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-            child: body,
-          );
-        }
-        return Transform.translate(offset: Offset(0, translate), child: body);
+        final translate = (1 - t) * 6.0;
+        return Opacity(
+          opacity: t,
+          child: Transform.translate(
+            offset: Offset(0, translate),
+            child: child,
+          ),
+        );
       },
       child: widget.child,
     );

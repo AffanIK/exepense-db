@@ -28,11 +28,14 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncTxns = ref.watch(expensesProvider);
-    return asyncTxns.when(
-      loading: () => const _LoadingShim(),
-      error: (e, _) =>
-          Center(child: Text('Error: $e', style: const TextStyle(color: AppColors.text2))),
-      data: (txns) => _Body(txns: txns, onAdd: onAdd, onEdit: onEdit),
+    return SizedBox.expand(
+      child: asyncTxns.when(
+        loading: () => const _LoadingShim(),
+        error: (e, _) => Center(
+            child: Text('Error: $e',
+                style: const TextStyle(color: AppColors.text2))),
+        data: (txns) => _Body(txns: txns, onAdd: onAdd, onEdit: onEdit),
+      ),
     );
   }
 }
@@ -53,9 +56,9 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final today = txns.where((t) => isToday(t.createdAtDate)).toList();
-    final week = txns.where((t) => isThisWeek(t.createdAtDate)).toList();
-    final month = txns.where((t) => isThisMonth(t.createdAtDate)).toList();
+    final today = txns.where((t) => isToday(t.dayDate)).toList();
+    final week = txns.where((t) => isThisWeek(t.dayDate)).toList();
+    final month = txns.where((t) => isThisMonth(t.dayDate)).toList();
 
     final todayTotal = today.fold<double>(0, (s, t) => s + t.amount);
     final weekTotal = week.fold<double>(0, (s, t) => s + t.amount);

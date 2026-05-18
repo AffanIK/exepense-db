@@ -33,13 +33,15 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(expensesProvider);
-    return async.when(
-      loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.accent)),
-      error: (e, _) => Center(
-          child: Text('Error: $e',
-              style: const TextStyle(color: AppColors.text2))),
-      data: (txns) => _build(context, txns),
+    return SizedBox.expand(
+      child: async.when(
+        loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.accent)),
+        error: (e, _) => Center(
+            child: Text('Error: $e',
+                style: const TextStyle(color: AppColors.text2))),
+        data: (txns) => _build(context, txns),
+      ),
     );
   }
 
@@ -47,13 +49,13 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     final filtered = all.where((t) {
       switch (_period) {
         case _Period.today:
-          if (!isToday(t.createdAtDate)) return false;
+          if (!isToday(t.dayDate)) return false;
           break;
         case _Period.week:
-          if (!isThisWeek(t.createdAtDate)) return false;
+          if (!isThisWeek(t.dayDate)) return false;
           break;
         case _Period.month:
-          if (!isThisMonth(t.createdAtDate)) return false;
+          if (!isThisMonth(t.dayDate)) return false;
           break;
         case _Period.all:
           break;
@@ -66,7 +68,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     final total = filtered.fold<double>(0, (s, t) => s + t.amount);
     final groups = <String, List<Expense>>{};
     for (final t in filtered) {
-      final k = dayLabel(t.createdAtDate);
+      final k = dayLabel(t.dayDate);
       groups.putIfAbsent(k, () => []).add(t);
     }
 

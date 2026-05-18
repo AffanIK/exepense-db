@@ -8,7 +8,6 @@ import '../utils/dates.dart';
 import '../widgets/expense_modal.dart';
 import '../widgets/floating_nav.dart';
 import 'analytics_screen.dart';
-import 'budget_screen.dart';
 import 'dashboard_screen.dart';
 import 'transactions_screen.dart';
 
@@ -38,7 +37,6 @@ class _RootShellState extends ConsumerState<RootShell> {
             date: toIsoDate(draft.date),
           );
         } else {
-          // No update endpoint in the FFI yet — emulate via delete + insert.
           await DbService.instance.deleteExpense(editing.id);
           await DbService.instance.insertExpense(
             amount: draft.amount,
@@ -67,7 +65,6 @@ class _RootShellState extends ConsumerState<RootShell> {
       DashboardScreen(onAdd: _openAdd, onEdit: _openEdit),
       TransactionsScreen(onAdd: _openAdd, onEdit: _openEdit),
       const AnalyticsScreen(),
-      const BudgetScreen(),
     ];
 
     return Scaffold(
@@ -77,27 +74,16 @@ class _RootShellState extends ConsumerState<RootShell> {
           const _AmbientBackground(),
           SafeArea(
             bottom: false,
-            child: Center(
+            child: Align(
+              alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 520),
                 child: AnimatedSwitcher(
-                  duration: AppDurations.tabIn,
-                  switchInCurve: AppCurves.tab,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, anim) {
-                    final slide = Tween<Offset>(
-                            begin: const Offset(0, 0.04), end: Offset.zero)
-                        .animate(anim);
-                    final scale = Tween<double>(begin: 0.985, end: 1)
-                        .animate(anim);
-                    return FadeTransition(
-                      opacity: anim,
-                      child: SlideTransition(
-                        position: slide,
-                        child: ScaleTransition(scale: scale, child: child),
-                      ),
-                    );
-                  },
+                  duration: const Duration(milliseconds: 220),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: child),
                   child: KeyedSubtree(
                     key: ValueKey(_tab),
                     child: tabs[_tab],
@@ -117,7 +103,6 @@ class _RootShellState extends ConsumerState<RootShell> {
                 NavItem(id: 'dashboard', icon: Icons.home_outlined),
                 NavItem(id: 'txns', icon: Icons.list_alt_outlined),
                 NavItem(id: 'analytics', icon: Icons.bar_chart_outlined),
-                NavItem(id: 'budget', icon: Icons.adjust),
               ],
             ),
           ),
@@ -134,11 +119,11 @@ class _AmbientBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.bg, const Color(0xFF0B0B14)],
+            colors: [AppColors.bg, Color(0xFF0B0B14)],
           ),
         ),
         child: Stack(
@@ -149,7 +134,10 @@ class _AmbientBackground extends StatelessWidget {
                   gradient: RadialGradient(
                     center: const Alignment(-0.6, -0.95),
                     radius: 0.9,
-                    colors: [AppColors.glow.withOpacity(0.4), Colors.transparent],
+                    colors: [
+                      AppColors.glow.withOpacity(0.4),
+                      Colors.transparent
+                    ],
                   ),
                 ),
               ),

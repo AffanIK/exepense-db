@@ -15,10 +15,13 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
-      child: Column(
-        children: [
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           Container(
             width: 48,
             height: 48,
@@ -42,7 +45,8 @@ class EmptyState extends StatelessWidget {
             const SizedBox(height: 12),
             _GradientButton(label: addLabel, onTap: onAdd!),
           ],
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -30,13 +30,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(expensesProvider);
-    return async.when(
-      loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.accent)),
-      error: (e, _) => Center(
-          child: Text('Error: $e',
-              style: const TextStyle(color: AppColors.text2))),
-      data: (txns) => _body(context, txns),
+    return SizedBox.expand(
+      child: async.when(
+        loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.accent)),
+        error: (e, _) => Center(
+            child: Text('Error: $e',
+                style: const TextStyle(color: AppColors.text2))),
+        data: (txns) => _body(context, txns),
+      ),
     );
   }
 
@@ -59,7 +61,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         final h0 = i * 4;
         final h1 = h0 + 4;
         final amount = txns.where((t) {
-          if (!isToday(t.createdAtDate)) return false;
+          if (!isToday(t.dayDate)) return false;
           final hr = t.createdAtDate.hour;
           return hr >= h0 && hr < h1;
         }).fold<double>(0, (s, t) => s + t.amount);
@@ -68,15 +70,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     }
     if (_range == _Range.w) {
       return List.generate(7, (i) {
-        final start = DateTime.now()
-            .subtract(Duration(days: 6 - i))
-            .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+        final ref = DateTime.now().subtract(Duration(days: 6 - i));
+        final start = DateTime(ref.year, ref.month, ref.day);
         final end = start.add(const Duration(days: 1));
         final amount = txns
             .where((t) =>
-                t.createdAtDate.isAfter(
-                    start.subtract(const Duration(milliseconds: 1))) &&
-                t.createdAtDate.isBefore(end))
+                !t.dayDate.isBefore(start) && t.dayDate.isBefore(end))
             .fold<double>(0, (s, t) => s + t.amount);
         return BarBucket(label: _weekday(start), amount: amount);
       });
@@ -84,15 +83,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     if (_range == _Range.m) {
       return List.generate(4, (i) {
         final wIdx = 3 - i;
-        final start = DateTime.now()
-            .subtract(Duration(days: 7 * (wIdx + 1) - 1))
-            .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0);
+        final ref = DateTime.now().subtract(Duration(days: 7 * (wIdx + 1) - 1));
+        final start = DateTime(ref.year, ref.month, ref.day);
         final end = start.add(const Duration(days: 7));
         final amount = txns
             .where((t) =>
-                t.createdAtDate.isAfter(
-                    start.subtract(const Duration(milliseconds: 1))) &&
-                t.createdAtDate.isBefore(end))
+                !t.dayDate.isBefore(start) && t.dayDate.isBefore(end))
             .fold<double>(0, (s, t) => s + t.amount);
         return BarBucket(label: 'W${4 - wIdx}', amount: amount);
       });
@@ -105,9 +101,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       final next = DateTime(d.year, d.month + 1, 1);
       final amount = txns
           .where((t) =>
-              t.createdAtDate.isAfter(
-                  d.subtract(const Duration(milliseconds: 1))) &&
-              t.createdAtDate.isBefore(next))
+              !t.dayDate.isBefore(d) && t.dayDate.isBefore(next))
           .fold<double>(0, (s, t) => s + t.amount);
       return BarBucket(label: _monthInitial(d), amount: amount);
     });
@@ -115,10 +109,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
   Widget _body(BuildContext context, List<Expense> txns) {
     final buckets = _buckets(txns);
-    final rangeTxns = txns.where((t) {
-      final cutoff = DateTime.now().subtract(Duration(days: _days));
-      return t.createdAtDate.isAfter(cutoff);
-    }).toList();
+    final cutoffRef = DateTime.now().subtract(Duration(days: _days));
+    final cutoff = DateTime(cutoffRef.year, cutoffRef.month, cutoffRef.day);
+    final rangeTxns =
+        txns.where((t) => !t.dayDate.isBefore(cutoff)).toList();
     final total = rangeTxns.fold<double>(0, (s, t) => s + t.amount);
     final avg = total / (_days == 0 ? 1 : _days);
 
