@@ -59,11 +59,14 @@ class DbService {
         .toList();
   }
 
+  /// Sums per *normalized* category id (legacy `Housing`/`Entertainment`
+  /// folded into `bills`/`leisure`). Keys are category ids like `food`.
   Future<Map<String, double>> sumByCategory() async {
     final rows = await queryExpenses();
     final map = <String, double>{};
     for (final e in rows) {
-      map[e.category] = (map[e.category] ?? 0) + e.amount;
+      final k = e.categoryId;
+      map[k] = (map[k] ?? 0) + e.amount;
     }
     return map;
   }

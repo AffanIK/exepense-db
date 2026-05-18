@@ -28,6 +28,9 @@ dependencies:
   # App-documents directory for the database path
   path_provider: ^2.1.0
 
+  # Local key-value store for budget caps and one-shot migration flags
+  shared_preferences: ^2.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
