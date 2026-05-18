@@ -81,7 +81,9 @@ jobs:
 
       - name: Generate FRB bridge code
         working-directory: flutter_app
-        run: flutter_rust_bridge_codegen generate
+        run: |
+          mkdir -p lib/src/bridge
+          flutter_rust_bridge_codegen generate
 
       - name: Cross-compile Rust for Android (arm64 + armv7)
         working-directory: crates/ffi
