@@ -83,11 +83,6 @@ class DonutChart extends StatelessWidget {
         radius: stroke,
         showTitle: false,
         color: d.color,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [d.color, d.color.withOpacity(0.65)],
-        ),
       );
     }).toList();
   }

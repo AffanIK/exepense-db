@@ -59,7 +59,12 @@ const kCategories = <CategoryMeta>[
   ),
 ];
 
-const _other = kCategories.last;
+const _other = CategoryMeta(
+  id: 'other',
+  name: 'Other',
+  color: Color(0xFFA78BFA),
+  icon: Icons.auto_awesome_outlined,
+);
 
 final Map<String, CategoryMeta> _byId = {
   for (final c in kCategories) c.id: c,
