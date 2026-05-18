@@ -27,7 +27,7 @@ class ExpenseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = buildAppTheme();
     return MaterialApp(
-      title: 'Lumen — Expense Tracker',
+      title: 'Expensify',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       darkTheme: theme,
