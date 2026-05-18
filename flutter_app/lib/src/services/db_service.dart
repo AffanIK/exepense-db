@@ -1,12 +1,8 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-
-// Once flutter_rust_bridge codegen runs, replace this import:
-// import '../bridge/frb_generated.dart';
+import '../bridge/api.dart' as api;
 import '../models/expense.dart';
 
-/// Singleton service wrapping all Rust FFI calls.
-/// Replace stub implementations with actual frb calls after codegen.
 class DbService {
   DbService._();
   static final DbService instance = DbService._();
@@ -18,9 +14,7 @@ class DbService {
     final dir = await getApplicationDocumentsDirectory();
     final dbPath = '${dir.path}/expense_db';
     await Directory(dbPath).create(recursive: true);
-
-    // Replace with: _handle = await api.openDb(path: dbPath);
-    _handle = 1; // stub
+    _handle = await api.openDb(path: dbPath);
   }
 
   Future<String> insertExpense({
@@ -28,24 +22,44 @@ class DbService {
     required String category,
     required String description,
     required String date,
-  }) async {
-    // Replace with: return api.insertExpense(handle: _handle!, amount: amount, ...);
-    return 'stub-id';
+  }) {
+    return api.insertExpense(
+      handle: _handle!,
+      amount: amount,
+      category: category,
+      description: description,
+      date: date,
+    );
   }
 
-  Future<List<Expense>> queryExpenses({String? whereCategory, String? orderBy, int? limit}) async {
+  Future<List<Expense>> queryExpenses({
+    String? whereCategory,
+    String? orderBy,
+    int? limit,
+  }) async {
     final conditions = <String>[];
-    if (whereCategory != null) conditions.add("category = '$whereCategory'");
+    if (whereCategory != null) {
+      conditions.add("category = '${whereCategory.replaceAll("'", "''")}'");
+    }
     final where = conditions.isNotEmpty ? 'WHERE ${conditions.join(' AND ')}' : '';
     final order = orderBy != null ? 'ORDER BY $orderBy DESC' : '';
     final lim = limit != null ? 'LIMIT $limit' : '';
     final sql = 'SELECT * FROM expenses $where $order $lim'.trim();
-    // Replace with: final rows = await api.queryExpenses(handle: _handle!, sqlText: sql);
-    return []; // stub
+
+    final rows = await api.queryExpenses(handle: _handle!, sqlText: sql);
+    return rows
+        .map((r) => Expense(
+              id: r.id,
+              amount: r.amount,
+              category: r.category,
+              description: r.description,
+              date: r.date,
+              createdAt: r.createdAt,
+            ))
+        .toList();
   }
 
   Future<Map<String, double>> sumByCategory() async {
-    // SELECT category FROM expenses GROUP BY category
     final rows = await queryExpenses();
     final map = <String, double>{};
     for (final e in rows) {
@@ -54,13 +68,13 @@ class DbService {
     return map;
   }
 
-  Future<void> deleteExpense(String id) async {
-    // Replace with: await api.deleteExpense(handle: _handle!, id: id);
+  Future<void> deleteExpense(String id) {
+    return api.deleteExpense(handle: _handle!, id: id);
   }
 
   void dispose() {
     if (_handle != null) {
-      // api.closeDb(handle: _handle!);
+      api.closeDb(handle: _handle!);
       _handle = null;
     }
   }

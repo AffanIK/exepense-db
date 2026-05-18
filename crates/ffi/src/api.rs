@@ -17,16 +17,16 @@ use crate::{FfiError, Result};
 
 // Global registry: handle -> engine.
 // Using a static Mutex<HashMap> avoids raw pointer FFI risks.
-static ENGINES: std::sync::OnceLock<Mutex<HashMap<u64, Arc<LsmEngine>>>> =
+static ENGINES: std::sync::OnceLock<Mutex<HashMap<i64, Arc<LsmEngine>>>> =
     std::sync::OnceLock::new();
-static NEXT_HANDLE: std::sync::atomic::AtomicU64 =
-    std::sync::atomic::AtomicU64::new(1);
+static NEXT_HANDLE: std::sync::atomic::AtomicI64 =
+    std::sync::atomic::AtomicI64::new(1);
 
-fn registry() -> &'static Mutex<HashMap<u64, Arc<LsmEngine>>> {
+fn registry() -> &'static Mutex<HashMap<i64, Arc<LsmEngine>>> {
     ENGINES.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
-fn get_engine(handle: u64) -> Result<Arc<LsmEngine>> {
+fn get_engine(handle: i64) -> Result<Arc<LsmEngine>> {
     registry()
         .lock()
         .get(&handle)
@@ -38,7 +38,7 @@ fn get_engine(handle: u64) -> Result<Arc<LsmEngine>> {
 
 /// Open (or create) a database at `path`.
 /// Returns an opaque handle used by all subsequent calls.
-pub fn open_db(path: String) -> Result<u64> {
+pub fn open_db(path: String) -> Result<i64> {
     let engine = LsmEngine::open(path)?;
     let handle = NEXT_HANDLE.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     registry().lock().insert(handle, engine);
@@ -46,14 +46,14 @@ pub fn open_db(path: String) -> Result<u64> {
 }
 
 /// Close the database handle and release its resources.
-pub fn close_db(handle: u64) {
+pub fn close_db(handle: i64) {
     registry().lock().remove(&handle);
 }
 
 /// Insert an expense record.
 /// Returns the generated UUID string for the new row.
 pub fn insert_expense(
-    handle: u64,
+    handle: i64,
     amount: f64,
     category: String,
     description: String,
@@ -76,7 +76,7 @@ pub fn insert_expense(
 }
 
 /// Execute a SELECT SQL query and return matching expense rows.
-pub fn query_expenses(handle: u64, sql_text: String) -> Result<Vec<FfiExpenseRow>> {
+pub fn query_expenses(handle: i64, sql_text: String) -> Result<Vec<FfiExpenseRow>> {
     let engine = get_engine(handle)?;
     let executor = Executor::new(engine);
     let stmt = parse(&sql_text).map_err(|e| FfiError::Sql(e))?;
@@ -87,7 +87,7 @@ pub fn query_expenses(handle: u64, sql_text: String) -> Result<Vec<FfiExpenseRow
 }
 
 /// Delete an expense by ID.
-pub fn delete_expense(handle: u64, id: String) -> Result<()> {
+pub fn delete_expense(handle: i64, id: String) -> Result<()> {
     let engine = get_engine(handle)?;
     let key = format!("expense:{}", id).into_bytes();
     engine.delete(key)?;

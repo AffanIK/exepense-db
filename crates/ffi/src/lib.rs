@@ -1,4 +1,5 @@
 pub mod api;
+mod frb_generated;
 
 pub use api::{close_db, delete_expense, insert_expense, open_db, query_expenses, FfiExpenseRow};
 

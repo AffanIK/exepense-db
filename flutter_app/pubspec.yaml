@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Rust FFI bridge (run `dart run flutter_rust_bridge:codegen` after setup)
-  flutter_rust_bridge: ^2.0.0
+  # Rust FFI bridge (run `flutter_rust_bridge_codegen generate` after setup)
+  flutter_rust_bridge: 2.0.0
 
   # State management
   flutter_riverpod: ^2.4.0
@@ -24,6 +24,9 @@ dependencies:
 
   # Icons
   cupertino_icons: ^1.0.6
+
+  # App-documents directory for the database path
+  path_provider: ^2.1.0
 
 dev_dependencies:
   flutter_test:
