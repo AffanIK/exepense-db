@@ -1,0 +1,29 @@
+[package]
+name = "benches"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+criterion  = { workspace = true }
+wal        = { path = "../crates/wal" }
+memtable   = { path = "../crates/memtable" }
+sstable    = { path = "../crates/sstable" }
+lsm        = { path = "../crates/lsm" }
+tempfile   = { workspace = true }
+tokio      = { workspace = true }
+
+[[bench]]
+name = "wal_bench"
+harness = false
+
+[[bench]]
+name = "memtable_bench"
+harness = false
+
+[[bench]]
+name = "sstable_bench"
+harness = false
+
+[[bench]]
+name = "lsm_bench"
+harness = false

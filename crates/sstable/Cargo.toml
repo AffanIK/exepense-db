@@ -1,0 +1,17 @@
+[package]
+name = "sstable"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bincode    = { workspace = true }
+crc32fast  = { workspace = true }
+memmap2    = { workspace = true }
+thiserror  = { workspace = true }
+tracing    = { workspace = true }
+tempfile   = { workspace = true }
+bloomfilter = { workspace = true }
+
+[dev-dependencies]
+proptest   = { workspace = true }
+tempfile   = { workspace = true }

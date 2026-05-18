@@ -1,0 +1,22 @@
+[package]
+name = "lsm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wal        = { path = "../wal" }
+memtable   = { path = "../memtable" }
+sstable    = { path = "../sstable" }
+bincode    = { workspace = true }
+thiserror  = { workspace = true }
+tokio      = { workspace = true }
+parking_lot = { workspace = true }
+tracing    = { workspace = true }
+tempfile   = { workspace = true }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+uuid       = { workspace = true }
+
+[dev-dependencies]
+proptest   = { workspace = true }
+tokio      = { workspace = true }

@@ -1,0 +1,10 @@
+target/
+*.sst
+*.wal
+manifest.json
+*.tmp
+.DS_Store
+flutter_app/.dart_tool/
+flutter_app/build/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
