@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::block::{BlockBuilder, BlockEntry};
 use crate::bloom::BloomFilter;
-use crate::footer::{Footer, FOOTER_SIZE};
+use crate::footer::Footer;
 use crate::{Result, SsTableError};
 
 /// Index entry: last key of a data block + its offset and length.

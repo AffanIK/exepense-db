@@ -39,7 +39,7 @@ impl WalReader {
             f.flush()?;
             tmp.as_file().sync_data()?;
         }
-        tmp.persist(&path).map_err(WalError::from)?;
+        tmp.persist(&path).map_err(|e| WalError::Io(e.error))?;
         Ok(())
     }
 }

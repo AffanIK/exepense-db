@@ -8,6 +8,7 @@ use crate::bloom::BloomFilter;
 use crate::footer::{Footer, FOOTER_SIZE};
 use crate::{Result, SsTableError};
 
+#[allow(dead_code)]
 pub struct SsTableReader {
     mmap: Arc<Mmap>,
     footer: Footer,

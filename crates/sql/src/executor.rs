@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use bincode::{config, decode_from_slice, encode_to_vec};
+use bincode::config;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -62,7 +62,7 @@ impl Executor {
         }
 
         let key = format!("expense:{}", id).into_bytes();
-        let value = encode_to_vec(&row, config::standard())?;
+        let value = bincode::serde::encode_to_vec(&row, config::standard())?;
         self.engine.put(key, value)?;
 
         Ok(QueryResult::Inserted { id })
@@ -74,7 +74,7 @@ impl Executor {
             let key = format!("expense:{}", id).into_bytes();
             let rows = match self.engine.get(&key)? {
                 Some(bytes) => {
-                    let (row, _): (ExpenseRow, _) = decode_from_slice(&bytes, config::standard())?;
+                    let (row, _): (ExpenseRow, _) = bincode::serde::decode_from_slice(&bytes, config::standard())?;
                     vec![row]
                 }
                 None => vec![],
@@ -87,7 +87,7 @@ impl Executor {
         let mut rows: Vec<ExpenseRow> = pairs
             .into_iter()
             .filter_map(|(_, bytes)| {
-                decode_from_slice::<ExpenseRow, _>(&bytes, config::standard())
+                bincode::serde::decode_from_slice::<ExpenseRow, _>(&bytes, config::standard())
                     .ok()
                     .map(|(r, _)| r)
             })
@@ -176,7 +176,7 @@ fn compare_values(left: &Value, op: &BinOp, right: &Value) -> bool {
     }
 }
 
-fn apply_op<T: PartialOrd>(a: &T, op: &BinOp, b: &T) -> bool {
+fn apply_op<T: PartialOrd + ?Sized>(a: &T, op: &BinOp, b: &T) -> bool {
     match op {
         BinOp::Eq => a == b,
         BinOp::Ne => a != b,

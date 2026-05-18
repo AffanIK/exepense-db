@@ -9,7 +9,7 @@ use wal::{WalReader, WalRecord, WalWriter};
 use crate::levels::LevelManager;
 use crate::manifest::Manifest;
 use crate::mvcc::{Snapshot, SnapshotRegistry};
-use crate::{LsmError, Result};
+use crate::Result;
 
 pub struct LsmEngine {
     dir: PathBuf,

@@ -22,7 +22,7 @@ pub struct LevelManager {
     inner: Arc<RwLock<LevelState>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct LevelState {
     /// levels[0] = L0 (newest-first ordering), levels[1..] = non-overlapping
     pub levels: Vec<Vec<SstMeta>>,

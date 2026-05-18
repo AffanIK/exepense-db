@@ -1,6 +1,4 @@
 use std::path::Path;
-use std::sync::Arc;
-
 use memtable::ImmutableMemTable;
 
 use crate::manifest::SstMeta;

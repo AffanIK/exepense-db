@@ -8,7 +8,7 @@ use tokio::sync::Semaphore;
 
 use sstable::{SsTableBuilder, SsTableReader};
 
-use crate::levels::{LevelManager, L0_COMPACTION_TRIGGER, LEVEL_SIZE_BUDGET};
+use crate::levels::{LevelManager, L0_COMPACTION_TRIGGER};
 use crate::manifest::{Manifest, SstMeta};
 use crate::mvcc::SnapshotRegistry;
 use crate::Result;

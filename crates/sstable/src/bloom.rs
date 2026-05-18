@@ -29,7 +29,7 @@ impl BloomFilter {
         let bitmap: Vec<u8> = bincode::decode_from_slice(bytes, bincode::config::standard())
             .map(|(v, _)| v)
             .unwrap_or_default();
-        let inner = Bloom::from_existing(&bitmap, bitmap_bits, k_num, [(0, 0), (1, 1), (2, 2), (3, 3)]);
+        let inner = Bloom::from_existing(&bitmap, bitmap_bits, k_num, [(0, 0), (1, 1)]);
         Self { inner }
     }
 
