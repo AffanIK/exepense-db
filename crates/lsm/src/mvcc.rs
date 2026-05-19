@@ -26,6 +26,14 @@ impl SnapshotRegistry {
         NEXT_SEQ.fetch_add(1, Ordering::SeqCst)
     }
 
+    /// Ensure the global write-seq counter is at least `min_next`. Called by
+    /// the engine on open after replaying the WAL so that:
+    ///   * future writes don't collide with replayed seq numbers
+    ///   * `begin_read()` returns a snapshot that includes every replayed row
+    pub fn bump_next_seq_to(min_next: u64) {
+        NEXT_SEQ.fetch_max(min_next, Ordering::SeqCst);
+    }
+
     pub fn oldest_active_snapshot(registry: &Arc<Self>) -> u64 {
         registry.active.lock().iter().copied().next().unwrap_or(u64::MAX)
     }

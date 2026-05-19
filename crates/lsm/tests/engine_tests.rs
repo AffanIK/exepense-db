@@ -57,3 +57,72 @@ fn wal_replayed_on_reopen() {
     let engine2 = LsmEngine::open(dir.path()).unwrap();
     assert_eq!(engine2.get(b"persist_me").unwrap(), Some(b"still here".to_vec()));
 }
+
+/// Regression: before the fix, NEXT_SEQ stayed at 1 across reopens, so the
+/// MVCC snapshot returned by begin_read() was 1, hiding every replayed row
+/// whose original seq_no was > 1. The app symptom was "all my expenses
+/// disappeared except the first one" after an app restart.
+#[test]
+fn all_writes_visible_after_reopen() {
+    let dir = tempdir().unwrap();
+
+    {
+        let engine = LsmEngine::open(dir.path()).unwrap();
+        for i in 0..20 {
+            engine
+                .put(format!("k{i:02}").into_bytes(), format!("v{i:02}").into_bytes())
+                .unwrap();
+        }
+    }
+
+    let engine2 = LsmEngine::open(dir.path()).unwrap();
+    for i in 0..20 {
+        assert_eq!(
+            engine2.get(format!("k{i:02}").as_bytes()).unwrap(),
+            Some(format!("v{i:02}").into_bytes()),
+            "row k{i:02} should be visible after reopen",
+        );
+    }
+
+    let scanned = engine2.scan_prefix(b"k").unwrap();
+    assert_eq!(scanned.len(), 20, "scan_prefix should return all 20 rows after reopen");
+}
+
+/// New writes made after a reopen must coexist with replayed rows — none
+/// should be hidden by an out-of-date seq counter.
+#[test]
+fn writes_after_reopen_keep_replayed_rows_visible() {
+    let dir = tempdir().unwrap();
+
+    {
+        let engine = LsmEngine::open(dir.path()).unwrap();
+        for i in 0..5 {
+            engine
+                .put(format!("old{i}").into_bytes(), format!("v{i}").into_bytes())
+                .unwrap();
+        }
+    }
+
+    let engine2 = LsmEngine::open(dir.path()).unwrap();
+    // Add new rows after reopen
+    for i in 0..5 {
+        engine2
+            .put(format!("new{i}").into_bytes(), format!("v{i}").into_bytes())
+            .unwrap();
+    }
+
+    // Old rows must still be visible
+    for i in 0..5 {
+        assert_eq!(
+            engine2.get(format!("old{i}").as_bytes()).unwrap(),
+            Some(format!("v{i}").into_bytes()),
+        );
+    }
+    // New rows must be visible
+    for i in 0..5 {
+        assert_eq!(
+            engine2.get(format!("new{i}").as_bytes()).unwrap(),
+            Some(format!("v{i}").into_bytes()),
+        );
+    }
+}

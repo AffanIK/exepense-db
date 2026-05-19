@@ -34,11 +34,23 @@ impl LsmEngine {
         let wal_path = dir.join("wal.log");
         let memtable = Arc::new(MemTable::new());
 
+        // Track the highest sequence number we've seen across the manifest
+        // and the WAL. After replay we must bump the global NEXT_SEQ counter
+        // past this value so that:
+        //   1. future writes get strictly higher seq_nos (no collisions)
+        //   2. begin_read() returns a snapshot >= max_seq, so every replayed
+        //      row is visible. (Before this fix, NEXT_SEQ stayed at 1 across
+        //      reopens, hiding every row whose original seq was > 1.)
+        let mut max_seq_seen: u64 = manifest.wal_flushed_seq;
+
         // Replay WAL into the fresh MemTable
         if wal_path.exists() {
             let reader = WalReader::open(&wal_path)?;
             for record in reader {
                 let record = record?;
+                if record.seq_no > max_seq_seen {
+                    max_seq_seen = record.seq_no;
+                }
                 if record.seq_no <= manifest.wal_flushed_seq {
                     continue; // already flushed to SSTable
                 }
@@ -48,6 +60,9 @@ impl LsmEngine {
                 }
             }
         }
+
+        // Make subsequent writes and reads consistent with replayed data.
+        SnapshotRegistry::bump_next_seq_to(max_seq_seen.saturating_add(1));
 
         let levels = LevelManager::new(manifest.levels.clone(), &dir);
         let wal = WalWriter::open(&wal_path)?;
