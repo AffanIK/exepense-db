@@ -303,61 +303,87 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             delay: const Duration(milliseconds: 300),
           ),
           if (peak.amount > 0) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.10),
-                border: Border.all(color: AppColors.accent.withOpacity(0.25)),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 1),
-                    child: Icon(Icons.auto_awesome,
-                        size: 16, color: AppColors.accent2),
+            const SizedBox(height: 18),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.pine,
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.text2,
-                          height: 1.45,
-                          letterSpacing: -0.1,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 1),
+                        child: Icon(Icons.auto_awesome,
+                            size: 16, color: AppColors.butter),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xCCFFFFFF),
+                              height: 1.5,
+                              letterSpacing: -0.1,
+                            ),
+                            children: [
+                              const TextSpan(text: 'Your highest '),
+                              TextSpan(
+                                  text: _range == _Range.d
+                                      ? 'window'
+                                      : _range == _Range.w
+                                          ? 'day'
+                                          : _range == _Range.m
+                                              ? 'week'
+                                              : 'month'),
+                              const TextSpan(text: ' was '),
+                              TextSpan(
+                                  text: peak.label,
+                                  style: const TextStyle(
+                                      color: AppColors.butter,
+                                      fontWeight: FontWeight.w700)),
+                              const TextSpan(text: ' at '),
+                              TextSpan(
+                                  text: formatPkr(peak.amount),
+                                  style: const TextStyle(
+                                      color: AppColors.butter,
+                                      fontWeight: FontWeight.w700)),
+                              const TextSpan(text: '.'),
+                            ],
+                          ),
                         ),
-                        children: [
-                          const TextSpan(text: 'Your highest '),
-                          TextSpan(
-                              text: _range == _Range.d
-                                  ? 'window'
-                                  : _range == _Range.w
-                                      ? 'day'
-                                      : _range == _Range.m
-                                          ? 'week'
-                                          : 'month'),
-                          const TextSpan(text: ' was '),
-                          TextSpan(
-                              text: peak.label,
-                              style: const TextStyle(
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.w600)),
-                          const TextSpan(text: ' at '),
-                          TextSpan(
-                              text: formatPkr(peak.amount),
-                              style: const TextStyle(
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.w600)),
-                          const TextSpan(text: '.'),
-                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: -8,
+                  left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.butter,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Text(
+                      'INSIGHT',
+                      style: TextStyle(
+                        color: AppColors.pine,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 2.2,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ],

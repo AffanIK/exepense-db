@@ -10,8 +10,8 @@ import '../widgets/count_up_text.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/glass_card.dart';
-import '../widgets/icon_button_glass.dart';
 import '../widgets/period_tile.dart';
+import '../widgets/slip_logo.dart';
 import '../widgets/staggered_fade.dart';
 import '../widgets/txn_row.dart';
 
@@ -47,7 +47,7 @@ class _LoadingShim extends StatelessWidget {
       const Center(child: CircularProgressIndicator(color: AppColors.accent));
 }
 
-class _Body extends StatelessWidget {
+class _Body extends StatefulWidget {
   final List<Expense> txns;
   final VoidCallback onAdd;
   final void Function(Expense) onEdit;
@@ -55,14 +55,24 @@ class _Body extends StatelessWidget {
   const _Body({required this.txns, required this.onAdd, required this.onEdit});
 
   @override
+  State<_Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> {
+  String _filter = 'all';
+
+  @override
   Widget build(BuildContext context) {
-    final today = txns.where((t) => isToday(t.dayDate)).toList();
+    final txns = widget.txns;
     final week = txns.where((t) => isThisWeek(t.dayDate)).toList();
     final month = txns.where((t) => isThisMonth(t.dayDate)).toList();
 
-    final todayTotal = today.fold<double>(0, (s, t) => s + t.amount);
     final weekTotal = week.fold<double>(0, (s, t) => s + t.amount);
     final monthTotal = month.fold<double>(0, (s, t) => s + t.amount);
+
+    final now = DateTime.now();
+    final dayCountSoFar = now.day.clamp(1, 31);
+    final dailyAvg = month.isEmpty ? 0.0 : monthTotal / dayCountSoFar;
 
     final byCat = <String, double>{};
     for (final t in month) {
@@ -75,60 +85,76 @@ class _Body extends StatelessWidget {
 
     final recent = [...txns]
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    final recent5 = recent.take(5).toList();
+    final filteredRecent = _filter == 'all'
+        ? recent
+        : recent.where((t) => t.categoryId == _filter).toList();
+    final shown = filteredRecent.take(10).toList();
 
     final greet = _greeting();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 140),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          StaggeredFade(child: _header(greet)),
-          const SizedBox(height: 16),
-          StaggeredFade(
-            delay: const Duration(milliseconds: 80),
-            child: _heroCard(context, todayTotal, today.length),
-          ),
-          const SizedBox(height: 16),
-          StaggeredFade(
-            delay: const Duration(milliseconds: 160),
-            child: Row(
-              children: [
-                Expanded(
-                  child: PeriodTile(
-                    label: 'This week',
-                    amount: weekTotal,
-                    count: week.length,
-                    delay: const Duration(milliseconds: 200),
-                  ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 150),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              StaggeredFade(child: _header(greet)),
+              const SizedBox(height: 18),
+              StaggeredFade(
+                delay: const Duration(milliseconds: 80),
+                child: _heroCard(context, monthTotal, month.length),
+              ),
+              const SizedBox(height: 12),
+              StaggeredFade(
+                delay: const Duration(milliseconds: 160),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: PeriodTile(
+                        label: 'This week',
+                        amount: weekTotal,
+                        count: week.length,
+                        delay: const Duration(milliseconds: 200),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: PeriodTile(
+                        label: 'Daily avg',
+                        amount: dailyAvg,
+                        count: dayCountSoFar,
+                        delay: const Duration(milliseconds: 280),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: PeriodTile(
-                    label: 'This month',
-                    amount: monthTotal,
-                    count: month.length,
-                    delay: const Duration(milliseconds: 280),
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 14),
+              StaggeredFade(
+                delay: const Duration(milliseconds: 240),
+                child: _donutCard(donut, donutTotal),
+              ),
+              const SizedBox(height: 16),
+              StaggeredFade(
+                delay: const Duration(milliseconds: 300),
+                child: _filtersRow(),
+              ),
+              const SizedBox(height: 10),
+              StaggeredFade(
+                delay: const Duration(milliseconds: 340),
+                child: _recent(context, shown),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          StaggeredFade(
-            delay: const Duration(milliseconds: 240),
-            child: _donutCard(donut, donutTotal),
-          ),
-          const SizedBox(height: 16),
-          StaggeredFade(
-            delay: const Duration(milliseconds: 320),
-            child: _recent(context, recent5),
-          ),
-        ],
-      ),
+        ),
+        Positioned(right: 22, bottom: 110, child: _fab()),
+      ],
     );
   }
+
+  VoidCallback get onAdd => widget.onAdd;
+  void Function(Expense) get onEdit => widget.onEdit;
 
   String _greeting() {
     final h = DateTime.now().hour;
@@ -138,6 +164,8 @@ class _Body extends StatelessWidget {
   }
 
   Widget _header(String greet) {
+    final now = DateTime.now();
+    final monthLabel = '${_month(now)} ${now.year}'.toUpperCase();
     return Row(
       children: [
         Expanded(
@@ -145,166 +173,139 @@ class _Body extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(greet,
+              Text(monthLabel,
                   style: const TextStyle(
                       color: AppColors.text3,
-                      fontSize: 13,
-                      letterSpacing: -0.1)),
-              const SizedBox(height: 2),
-              const Text('Welcome back',
-                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.6)),
+              const SizedBox(height: 4),
+              Text(greet,
+                  style: const TextStyle(
                       color: AppColors.text,
                       fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: -0.4)),
             ],
           ),
         ),
-        const IconButtonGlass(icon: Icons.search),
-        const SizedBox(width: 10),
-        const IconButtonGlass(icon: Icons.calendar_today_outlined),
+        const SlipMark(size: 40),
       ],
     );
   }
 
-  Widget _heroCard(BuildContext context, double todayTotal, int count) {
-    final today = DateTime.now();
-    final dateLine = '${_weekday(today)}, ${_month(today)} ${today.day}';
+  Widget _heroCard(BuildContext context, double monthTotal, int count) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Positioned(
-          top: -60,
-          left: -40,
-          right: -40,
-          height: 200,
-          child: IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(-0.4, -0.6),
-                  radius: 0.7,
-                  colors: [AppColors.glow, AppColors.glow.withOpacity(0)],
-                ),
-              ),
-            ),
-          ),
-        ),
         GlassCard(
           highlight: true,
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'SPENT TODAY',
-                      style: TextStyle(
-                          color: AppColors.text2,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.4),
-                    ),
-                  ),
-                  Container(
-                    width: 6,
-                    height: 6,
+              // Butter glow in top-right
+              Positioned(
+                top: -68,
+                right: -54,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 220,
+                    height: 220,
                     decoration: BoxDecoration(
-                      color: AppColors.accent2,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: AppColors.glow, blurRadius: 8),
-                      ],
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.butter.withOpacity(0.65),
+                          AppColors.butter.withOpacity(0),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    dateLine.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.accent2,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 6),
-              Row(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8, right: 6),
-                    child: Text(
-                      'PKR',
-                      style: TextStyle(
-                        color: AppColors.text2,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: CountUpText(
-                      value: todayTotal,
-                      delay: const Duration(milliseconds: 200),
-                      formatter: (v) => _bigNumber(v),
-                      style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 44,
+                  const Text(
+                    'SPENT THIS MONTH',
+                    style: TextStyle(
+                        color: AppColors.text3,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: -1.8,
-                        height: 1.05,
-                      ),
-                    ),
+                        letterSpacing: 1.6),
                   ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '$count expense${count == 1 ? '' : 's'}',
-                      style: const TextStyle(
-                          color: AppColors.text3, fontSize: 12),
-                    ),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: onAdd,
-                      borderRadius: BorderRadius.circular(999),
-                      child: Ink(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 9),
-                        decoration: BoxDecoration(
-                          gradient: AppGradients.accent,
-                          borderRadius: BorderRadius.circular(999),
-                          boxShadow: [
-                            BoxShadow(color: AppColors.glow, blurRadius: 20),
-                          ],
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 14, right: 6),
+                        child: Text(
+                          'Rs',
+                          style: TextStyle(
+                            color: AppColors.text3,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        child: const Row(
+                      ),
+                      Expanded(
+                        child: CountUpText(
+                          value: monthTotal,
+                          delay: const Duration(milliseconds: 200),
+                          formatter: (v) => _bigNumber(v),
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -1.8,
+                            height: 1.05,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.teal.withOpacity(0.10),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                              color: AppColors.teal.withOpacity(0.30)),
+                        ),
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.add, size: 14, color: Colors.white),
-                            SizedBox(width: 6),
+                            const Icon(Icons.bolt_outlined,
+                                size: 12, color: AppColors.tealDeep),
+                            const SizedBox(width: 4),
                             Text(
-                              'Add expense',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
+                              '$count log${count == 1 ? '' : 's'}',
+                              style: const TextStyle(
+                                color: AppColors.tealDeep,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                letterSpacing: -0.1,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'tap + to log a new expense',
+                          style: TextStyle(
+                              color: AppColors.text3,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -312,6 +313,106 @@ class _Body extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _filtersRow() {
+    return SizedBox(
+      height: 38,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        children: [
+          _filterChip(label: 'All', active: _filter == 'all', color: AppColors.teal,
+              onTap: () => setState(() => _filter = 'all')),
+          ...kCategories.map((c) => Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: _filterChip(
+                  label: c.name,
+                  active: _filter == c.id,
+                  color: c.color,
+                  icon: c.icon,
+                  onTap: () => setState(() => _filter = c.id),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _filterChip({
+    required String label,
+    required bool active,
+    required Color color,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: AppCurves.spring,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? color.withOpacity(0.14) : Colors.white,
+          border: Border.all(color: active ? color : AppColors.border),
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: active
+              ? [BoxShadow(color: color.withOpacity(0.20), blurRadius: 14)]
+              : [
+                  BoxShadow(
+                    color: AppColors.pine.withOpacity(0.04),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 14, color: active ? color : AppColors.text3),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: active ? color : AppColors.text2,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fab() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onAdd,
+        borderRadius: BorderRadius.circular(28),
+        child: Ink(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: AppGradients.accent,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.teal.withOpacity(0.45),
+                offset: const Offset(0, 10),
+                blurRadius: 28,
+              ),
+            ],
+            border: Border.all(color: AppColors.butter.withOpacity(0.4)),
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
+        ),
+      ),
     );
   }
 
@@ -345,16 +446,17 @@ class _Body extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0x0FFFFFFF),
+                  color: AppColors.butter.withOpacity(0.45),
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: AppColors.butter),
                 ),
                 child: Text(
                   _month(DateTime.now()),
                   style: const TextStyle(
-                      color: AppColors.text2,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600),
+                      color: AppColors.pine,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4),
                 ),
               ),
             ],
@@ -519,11 +621,6 @@ class _Body extends StatelessWidget {
           ),
       ],
     );
-  }
-
-  static String _weekday(DateTime d) {
-    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return names[d.weekday - 1];
   }
 
   static String _month(DateTime d) {

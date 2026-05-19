@@ -59,9 +59,9 @@ class TxnRow extends StatelessWidget {
               Text(
                 formatExpense(expense.amount),
                 style: const TextStyle(
-                  color: AppColors.text,
+                  color: AppColors.expense,
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),

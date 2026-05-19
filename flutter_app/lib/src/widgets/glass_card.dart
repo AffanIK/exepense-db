@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -20,37 +19,39 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        highlight ? const Color(0x527C3AED) : AppColors.border;
+    final borderColor = highlight ? AppColors.borderHi : AppColors.border;
 
-    Widget content = ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient:
-                highlight ? AppGradients.glassHi : null,
-            color: highlight ? null : AppColors.card,
-            border: Border.all(color: borderColor, width: 1),
-            borderRadius: BorderRadius.circular(radius),
+    Widget content = Container(
+      decoration: BoxDecoration(
+        gradient: highlight ? AppGradients.glassHi : null,
+        color: highlight ? null : AppColors.cardSolid,
+        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.pine.withOpacity(highlight ? 0.10 : 0.06),
+            offset: const Offset(0, 12),
+            blurRadius: 28,
           ),
-          child: Stack(
-            children: [
-              if (highlight)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: AppGradients.glassSheen,
-                        borderRadius: BorderRadius.circular(radius),
-                      ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Stack(
+          children: [
+            if (highlight)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: AppGradients.glassSheen,
+                      borderRadius: BorderRadius.circular(radius),
                     ),
                   ),
                 ),
-              Padding(padding: padding, child: child),
-            ],
-          ),
+              ),
+            Padding(padding: padding, child: child),
+          ],
         ),
       ),
     );

@@ -36,14 +36,14 @@ class FloatingNav extends StatelessWidget {
             width: width,
             padding: const EdgeInsets.all(_pad),
             decoration: BoxDecoration(
-              color: const Color(0xB81F2042),
+              color: Colors.white.withOpacity(0.78),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: AppColors.borderHi),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.55),
-                    offset: const Offset(0, 18),
-                    blurRadius: 40),
+                    color: AppColors.pine.withOpacity(0.10),
+                    offset: const Offset(0, 14),
+                    blurRadius: 32),
               ],
             ),
             child: Stack(
@@ -60,7 +60,11 @@ class FloatingNav extends StatelessWidget {
                       gradient: AppGradients.accent,
                       borderRadius: BorderRadius.circular(999),
                       boxShadow: [
-                        BoxShadow(color: AppColors.glow, blurRadius: 16),
+                        BoxShadow(
+                          color: AppColors.teal.withOpacity(0.40),
+                          offset: const Offset(0, 6),
+                          blurRadius: 14,
+                        ),
                       ],
                     ),
                   ),

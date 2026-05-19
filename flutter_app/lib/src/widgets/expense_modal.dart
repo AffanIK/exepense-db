@@ -40,7 +40,7 @@ class ExpenseModal extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.55),
+      barrierColor: AppColors.pine.withOpacity(0.35),
       builder: (_) => ExpenseModal(
         editing: editing,
         onSubmit: onSubmit,
@@ -88,11 +88,11 @@ class _ExpenseModalState extends State<ExpenseModal> {
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: AppColors.accent,
+          colorScheme: const ColorScheme.light(
+            primary: AppColors.teal,
             onPrimary: Colors.white,
-            surface: AppColors.bg3,
-            onSurface: AppColors.text,
+            surface: AppColors.cream,
+            onSurface: AppColors.pine,
           ),
         ),
         child: child!,
@@ -137,20 +137,20 @@ class _ExpenseModalState extends State<ExpenseModal> {
       child: Container(
         constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.92),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.bg3, AppColors.bg2],
-          ),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border(
-            top: BorderSide(color: AppColors.border),
+        decoration: BoxDecoration(
+          color: AppColors.bg3,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: const Border(
+            top: BorderSide(color: AppColors.borderHi),
             left: BorderSide(color: AppColors.border),
             right: BorderSide(color: AppColors.border),
           ),
           boxShadow: [
-            BoxShadow(color: Colors.black54, offset: Offset(0, -20), blurRadius: 60),
+            BoxShadow(
+              color: AppColors.pine.withOpacity(0.18),
+              offset: const Offset(0, -16),
+              blurRadius: 40,
+            ),
           ],
         ),
         child: ClipRRect(
@@ -164,10 +164,10 @@ class _ExpenseModalState extends State<ExpenseModal> {
               children: [
                 Center(
                   child: Container(
-                    width: 40,
+                    width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0x2EFFFFFF),
+                      color: AppColors.pine.withOpacity(0.20),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -324,7 +324,7 @@ class _ExpenseModalState extends State<ExpenseModal> {
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.text4),
         filled: true,
-        fillColor: const Color(0x0AFFFFFF),
+        fillColor: AppColors.bg2,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         border: OutlineInputBorder(
@@ -337,7 +337,7 @@ class _ExpenseModalState extends State<ExpenseModal> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.accent),
+          borderSide: const BorderSide(color: AppColors.teal, width: 1.5),
         ),
       ),
     );
@@ -374,7 +374,7 @@ class _ExpenseModalState extends State<ExpenseModal> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0x0AFFFFFF),
+          color: AppColors.bg2,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
         ),
@@ -480,22 +480,31 @@ class _ExpenseModalState extends State<ExpenseModal> {
                 onTap: _valid ? _submit : null,
                 borderRadius: BorderRadius.circular(16),
                 child: Ink(
-                  height: 50,
+                  height: 52,
                   decoration: BoxDecoration(
                     gradient: AppGradients.accent,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: _valid
-                        ? [BoxShadow(color: AppColors.glow, blurRadius: 22)]
+                        ? [
+                            BoxShadow(
+                              color: AppColors.teal.withOpacity(0.40),
+                              offset: const Offset(0, 10),
+                              blurRadius: 22,
+                            )
+                          ]
                         : null,
+                    border: Border.all(
+                      color: AppColors.butter.withOpacity(_valid ? 0.45 : 0),
+                    ),
                   ),
                   child: Center(
                     child: Text(
-                      editing ? 'Save changes' : 'Add expense',
+                      editing ? 'SAVE CHANGES' : 'ADD EXPENSE',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.8,
                       ),
                     ),
                   ),
@@ -517,7 +526,7 @@ class _RoundIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0x14FFFFFF),
+      color: AppColors.bg2,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -551,17 +560,17 @@ class _SmallToggle extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: active
-              ? AppColors.accent.withOpacity(0.15)
-              : const Color(0x0AFFFFFF),
-          border: Border.all(color: active ? AppColors.accent : AppColors.border),
+              ? AppColors.teal.withOpacity(0.14)
+              : AppColors.bg2,
+          border: Border.all(color: active ? AppColors.teal : AppColors.border),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: active ? AppColors.accent2 : AppColors.text2,
+            color: active ? AppColors.tealDeep : AppColors.text2,
             fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -590,7 +599,7 @@ class _CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active
               ? meta.color.withOpacity(0.13)
-              : const Color(0x0AFFFFFF),
+              : AppColors.bg2,
           border: Border.all(color: active ? meta.color : AppColors.border),
           borderRadius: BorderRadius.circular(999),
         ),

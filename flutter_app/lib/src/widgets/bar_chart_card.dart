@@ -70,9 +70,9 @@ class AnimatedBarChart extends StatelessWidget {
                         child: Text(
                           formatPkr(amt, decimals: 0).replaceFirst('PKR ', ''),
                           style: const TextStyle(
-                            color: AppColors.accent2,
+                            color: AppColors.tealDeep,
                             fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             letterSpacing: -0.2,
                           ),
                         ),
@@ -93,10 +93,10 @@ class AnimatedBarChart extends StatelessWidget {
                         child: Text(
                           data[i].label.toUpperCase(),
                           style: TextStyle(
-                            color: isPeak ? AppColors.accent2 : AppColors.text3,
+                            color: isPeak ? AppColors.tealDeep : AppColors.text3,
                             fontSize: 11,
                             fontWeight:
-                                isPeak ? FontWeight.w600 : FontWeight.w500,
+                                isPeak ? FontWeight.w700 : FontWeight.w500,
                             letterSpacing: 0.4,
                           ),
                         ),
@@ -120,14 +120,15 @@ class AnimatedBarChart extends StatelessWidget {
                           ? const LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
-                              colors: [AppColors.accent, AppColors.accent3],
+                              colors: [AppColors.butter, AppColors.teal],
+                              stops: [0.0, 0.35],
                             )
-                          : const LinearGradient(
+                          : LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Color(0x1AFFFFFF),
-                                Color(0x0AFFFFFF),
+                                AppColors.pine.withOpacity(0.10),
+                                AppColors.pine.withOpacity(0.04),
                               ],
                             ),
                       borderSide: peak

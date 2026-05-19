@@ -123,7 +123,7 @@ class _AmbientBackground extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.bg, Color(0xFF0B0B14)],
+            colors: [AppColors.cream, AppColors.bg2],
           ),
         ),
         child: Stack(
@@ -135,8 +135,8 @@ class _AmbientBackground extends StatelessWidget {
                     center: const Alignment(-0.6, -0.95),
                     radius: 0.9,
                     colors: [
-                      AppColors.glow.withOpacity(0.4),
-                      Colors.transparent
+                      AppColors.teal.withOpacity(0.10),
+                      Colors.transparent,
                     ],
                   ),
                 ),
@@ -146,11 +146,11 @@ class _AmbientBackground extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
-                    center: const Alignment(0.9, -0.8),
-                    radius: 0.6,
+                    center: const Alignment(0.9, 0.85),
+                    radius: 0.7,
                     colors: [
-                      AppColors.accent2.withOpacity(0.10),
-                      Colors.transparent
+                      AppColors.butter.withOpacity(0.22),
+                      Colors.transparent,
                     ],
                   ),
                 ),

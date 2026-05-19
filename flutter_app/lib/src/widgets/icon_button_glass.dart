@@ -26,15 +26,22 @@ class IconButtonGlass extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: const Color(0x0DFFFFFF),
+            color: Colors.white,
             border: Border.all(color: AppColors.border),
             borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.pine.withOpacity(0.06),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              ),
+            ],
           ),
           alignment: Alignment.center,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(icon, size: 18, color: AppColors.text),
+              Icon(icon, size: 18, color: AppColors.pine),
               if (dot)
                 Positioned(
                   top: -2,

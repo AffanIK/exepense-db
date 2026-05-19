@@ -1,61 +1,82 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const bg = Color(0xFF0F0F1A);
-  static const bg2 = Color(0xFF16172B);
-  static const bg3 = Color(0xFF1C1D33);
-  static const cardSolid = Color(0xFF1A1B2E);
+  // Slip brand palette
+  static const teal = Color(0xFF0F8F87);
+  static const tealDeep = Color(0xFF0A6E68);
+  static const butter = Color(0xFFFFE38A);
+  static const pine = Color(0xFF0C2A28);
+  static const cream = Color(0xFFF0EEE9);
 
-  static const card = Color(0x09FFFFFF);
-  static const border = Color(0x12FFFFFF);
-  static const borderHi = Color(0x24FFFFFF);
+  // Surfaces
+  static const bg = cream;
+  static const bg2 = Color(0xFFE8E5DC);
+  static const bg3 = Color(0xFFFFFFFF);
+  static const cardSolid = Color(0xFFFFFFFF);
 
-  static const accent = Color(0xFF7C3AED);
-  static const accent2 = Color(0xFFA78BFA);
-  static const accent3 = Color(0xFF5B21B6);
-  static const glow = Color(0x8C7C3AED);
+  // Translucent surfaces over cream
+  static const card = Color(0xE8FFFFFF);
+  static const cardLow = Color(0xCCFFFFFF);
+  static const border = Color(0x140C2A28);
+  static const borderHi = Color(0x2A0C2A28);
 
-  static const income = Color(0xFF10E0A0);
-  static const incomeBg = Color(0x1F10E0A0);
-  static const expense = Color(0xFFFF5570);
-  static const expenseBg = Color(0x1FFF5570);
+  // Brand-mapped accents (legacy names retained so existing widgets compile)
+  static const accent = teal;
+  static const accent2 = butter;
+  static const accent3 = tealDeep;
+  static const glow = Color(0x4D0F8F87);
 
-  static const text = Color(0xFFFFFFFF);
-  static const text2 = Color(0x9EFFFFFF);
-  static const text3 = Color(0x61FFFFFF);
-  static const text4 = Color(0x38FFFFFF);
+  // Semantic
+  static const income = teal;
+  static const incomeBg = Color(0x1F0F8F87);
+  static const expense = Color(0xFFC24B3F);
+  static const expenseBg = Color(0x1FC24B3F);
+
+  // Ink (text on cream)
+  static const text = pine;
+  static const text2 = Color(0xB30C2A28);
+  static const text3 = Color(0x800C2A28);
+  static const text4 = Color(0x4D0C2A28);
 }
 
 class AppGradients {
   static const accent = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [AppColors.accent, AppColors.accent3],
+    colors: [AppColors.teal, AppColors.tealDeep],
   );
 
+  static const butterWash = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFEFB4), Color(0xFFFFE38A)],
+  );
+
+  // Used by GlassCard(highlight:true) — frosted white tinted with teal
   static const glassHi = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0x2E7C3AED), Color(0x0A7C3AED)],
+    colors: [Color(0xF2FFFFFF), Color(0xE6F4FCFB)],
   );
 
+  // Inner sheen on highlighted glass — bright top, faint pine at bottom
   static const glassSheen = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     stops: [0.0, 0.35, 0.65, 1.0],
     colors: [
-      Color(0x1AFFFFFF),
+      Color(0x80FFFFFF),
       Color(0x00FFFFFF),
       Color(0x00FFFFFF),
-      Color(0x0AFFFFFF),
+      Color(0x0F0C2A28),
     ],
   );
 
   static LinearGradient catTile(Color c) => LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [c.withOpacity(0.20), c.withOpacity(0.08)],
+        colors: [c.withOpacity(0.22), c.withOpacity(0.10)],
       );
 }
 
@@ -85,18 +106,12 @@ class AppCurves {
   static const slide = Cubic(.34, 1.4, .64, 1);
 }
 
-const _fontStack = <String>[
-  '.SF Pro Display',
-  '.SF Pro Text',
-  'Segoe UI',
-  'Roboto',
-  'system-ui',
-];
-
 const _tabular = <FontFeature>[FontFeature.tabularFigures()];
 
 ThemeData buildAppTheme() {
-  const base = TextStyle(color: AppColors.text);
+  final base = GoogleFonts.bricolageGrotesque(color: AppColors.text);
+  final mono = GoogleFonts.jetBrainsMono(color: AppColors.text);
+
   final textTheme = TextTheme(
     displayLarge: base.copyWith(
       fontSize: 44,
@@ -118,7 +133,7 @@ ThemeData buildAppTheme() {
     ),
     titleLarge: base.copyWith(
       fontSize: 20,
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w700,
       letterSpacing: -0.4,
     ),
     titleMedium: base.copyWith(
@@ -138,31 +153,61 @@ ThemeData buildAppTheme() {
     ),
   );
 
-  final scheme = const ColorScheme.dark(
-    primary: AppColors.accent,
+  final scheme = const ColorScheme.light(
+    primary: AppColors.teal,
     onPrimary: Colors.white,
-    secondary: AppColors.accent2,
-    onSecondary: Colors.white,
-    surface: AppColors.bg,
-    onSurface: AppColors.text,
+    secondary: AppColors.butter,
+    onSecondary: AppColors.pine,
+    surface: AppColors.cream,
+    onSurface: AppColors.pine,
     error: AppColors.expense,
     onError: Colors.white,
   );
 
   return ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     colorScheme: scheme,
     scaffoldBackgroundColor: AppColors.bg,
     canvasColor: AppColors.bg,
-    fontFamily: _fontStack.first,
-    fontFamilyFallback: _fontStack.skip(1).toList(),
     textTheme: textTheme,
     splashFactory: InkSparkle.splashFactory,
-    splashColor: AppColors.accent.withOpacity(0.08),
-    highlightColor: AppColors.accent.withOpacity(0.06),
+    splashColor: AppColors.teal.withOpacity(0.08),
+    highlightColor: AppColors.teal.withOpacity(0.06),
     dividerColor: AppColors.border,
   );
 }
 
 TextStyle tabularize(TextStyle s) => s.copyWith(fontFeatures: _tabular);
+
+/// Tabular mono number style — for amounts, percentages, counts.
+TextStyle slipMono({
+  double fontSize = 16,
+  FontWeight fontWeight = FontWeight.w700,
+  Color color = AppColors.pine,
+  double letterSpacing = -0.4,
+}) =>
+    GoogleFonts.jetBrainsMono(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      fontFeatures: _tabular,
+    );
+
+/// Display style — Bricolage Grotesque headings.
+TextStyle slipDisplay({
+  double fontSize = 32,
+  FontWeight fontWeight = FontWeight.w700,
+  Color color = AppColors.pine,
+  double letterSpacing = -0.9,
+  double height = 1.05,
+}) =>
+    GoogleFonts.bricolageGrotesque(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      height: height,
+      fontFeatures: _tabular,
+    );

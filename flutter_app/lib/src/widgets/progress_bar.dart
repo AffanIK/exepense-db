@@ -24,7 +24,7 @@ class AnimatedProgressBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: height,
-            color: const Color(0x0FFFFFFF),
+            color: AppColors.pine.withOpacity(0.06),
             child: Align(
               alignment: Alignment.centerLeft,
               child: TweenAnimationBuilder<double>(
@@ -44,10 +44,10 @@ class AnimatedProgressBar extends StatelessWidget {
                   width: c.maxWidth * v,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [color, color.withOpacity(0.8)],
+                      colors: [color.withOpacity(0.85), color],
                     ),
                     boxShadow: [
-                      BoxShadow(color: color.withOpacity(0.4), blurRadius: 10),
+                      BoxShadow(color: color.withOpacity(0.28), blurRadius: 8),
                     ],
                     borderRadius: BorderRadius.circular(999),
                   ),

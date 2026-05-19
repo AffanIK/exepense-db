@@ -26,17 +26,20 @@ class EmptyState extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0x337C3AED), Color(0x117C3AED)],
+                colors: [
+                  AppColors.butter.withOpacity(0.55),
+                  AppColors.butter.withOpacity(0.30),
+                ],
               ),
-              border: Border.all(color: const Color(0x527C3AED)),
+              border: Border.all(color: AppColors.butter),
               borderRadius: BorderRadius.circular(16),
             ),
             alignment: Alignment.center,
-            child: const Icon(Icons.auto_awesome_outlined,
-                size: 22, color: AppColors.accent2),
+            child: const Icon(Icons.receipt_long_outlined,
+                size: 22, color: AppColors.pine),
           ),
           const SizedBox(height: 12),
           Text(label,

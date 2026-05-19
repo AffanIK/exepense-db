@@ -164,14 +164,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0x0FFFFFFF),
+              color: AppColors.pine.withOpacity(0.06),
               borderRadius: BorderRadius.circular(6),
             ),
             child: const Text('⌘K',
                 style: TextStyle(
                     color: AppColors.text3,
                     fontSize: 11,
-                    fontWeight: FontWeight.w500)),
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -261,18 +261,30 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         decoration: BoxDecoration(
           color: active
               ? (meta == null
-                  ? AppColors.accent
-                  : color.withOpacity(0.15))
-              : const Color(0x0DFFFFFF),
+                  ? AppColors.teal
+                  : color.withOpacity(0.14))
+              : Colors.white,
           border: Border.all(
             color: active
-                ? (meta == null ? Colors.transparent : color)
+                ? (meta == null ? AppColors.teal : color)
                 : AppColors.border,
           ),
           borderRadius: BorderRadius.circular(999),
-          boxShadow: active && meta == null
-              ? [BoxShadow(color: AppColors.glow, blurRadius: 16)]
-              : null,
+          boxShadow: active
+              ? [
+                  BoxShadow(
+                    color: (meta == null ? AppColors.teal : color)
+                        .withOpacity(0.24),
+                    blurRadius: 14,
+                  )
+                ]
+              : [
+                  BoxShadow(
+                    color: AppColors.pine.withOpacity(0.04),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6,
+                  ),
+                ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -289,8 +301,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                 color: active
                     ? (meta == null ? Colors.white : color)
                     : AppColors.text2,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.1,
               ),
             ),
@@ -383,17 +395,21 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: widget.onAdd,
-        borderRadius: BorderRadius.circular(18),
+        customBorder: const CircleBorder(),
         child: Ink(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
+            shape: BoxShape.circle,
             gradient: AppGradients.accent,
-            borderRadius: BorderRadius.circular(18),
             boxShadow: [
-              BoxShadow(color: AppColors.glow, blurRadius: 32, spreadRadius: 0),
+              BoxShadow(
+                color: AppColors.teal.withOpacity(0.40),
+                offset: const Offset(0, 10),
+                blurRadius: 24,
+              ),
             ],
-            border: Border.all(color: AppColors.accent2.withOpacity(0.33)),
+            border: Border.all(color: AppColors.butter.withOpacity(0.4)),
           ),
           child: const Icon(Icons.add, color: Colors.white, size: 26),
         ),

@@ -73,7 +73,7 @@ class DonutChart extends StatelessWidget {
           value: 1,
           radius: stroke,
           showTitle: false,
-          color: const Color(0x0DFFFFFF),
+          color: AppColors.pine.withOpacity(0.08),
         ),
       ];
     }

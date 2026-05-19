@@ -75,13 +75,33 @@ jobs:
         working-directory: flutter_app
         run: flutter create . --platforms=android --project-name expense_db_app --org com.expensedb
 
-      - name: Set Android launcher label to Expensify
+      - name: Set Android launcher label to Slip
         working-directory: flutter_app
         run: |
-          sed -i 's|android:label="expense_db_app"|android:label="Expensify"|g' \
+          sed -i 's|android:label="expense_db_app"|android:label="Slip"|g' \
             android/app/src/main/AndroidManifest.xml
           echo "--- AndroidManifest.xml after patch ---"
           grep 'android:label' android/app/src/main/AndroidManifest.xml || true
+
+      - name: Install Slip launcher icon
+        working-directory: flutter_app
+        run: |
+          # Generate launcher icons from the Slip icon asset for each density.
+          ICON=assets/branding/slip_icon.png
+          if [ ! -f "$ICON" ]; then
+            echo "Slip icon asset not found at $ICON" >&2
+            exit 1
+          fi
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq imagemagick
+          declare -A SIZES=( [mdpi]=48 [hdpi]=72 [xhdpi]=96 [xxhdpi]=144 [xxxhdpi]=192 )
+          for d in "${!SIZES[@]}"; do
+            mkdir -p "android/app/src/main/res/mipmap-$d"
+            convert "$ICON" -resize "${SIZES[$d]}x${SIZES[$d]}" \
+              "android/app/src/main/res/mipmap-$d/ic_launcher.png"
+          done
+          echo "--- Generated launcher icons ---"
+          ls -la android/app/src/main/res/mipmap-*/ic_launcher.png
 
       - name: Flutter pub get
         working-directory: flutter_app
